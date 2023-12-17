@@ -1,7 +1,6 @@
 import ImageGalleryItem from './ImageGalleryItem';
 
 const ImageGallery = ({ images, openModal }) => {
-  console.log(images);
   return (
     <ul className="ImageGallery">
       {images.map(image => (

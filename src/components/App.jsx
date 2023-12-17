@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Searchbar from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
@@ -28,21 +28,27 @@ const App = () => {
 
       setImages(prevImages => [...prevImages, ...hits.slice(0, perPage)]);
       setCurrentPage(prevPage => prevPage + 1);
-      setHasMoreImages(currentPage < Math.ceil(totalHits / perPage));
+      setHasMoreImages(page < Math.ceil(totalHits / perPage));
     } catch (error) {
       console.error('Error fetching images:', error);
     } finally {
       setIsLoading(false);
     }
   };
-
   const handleSearchSubmit = searchQuery => {
-    setQuery(searchQuery);
-    setImages([]);
-    setCurrentPage(1);
-    setHasMoreImages(true);
-    fetchImages(searchQuery, 1);
+    if (searchQuery.trim() !== '') {
+      setQuery(searchQuery);
+    }
   };
+
+  useEffect(() => {
+    if (query.trim() !== '') {
+      setImages([]);
+      setCurrentPage(1);
+      setHasMoreImages(true);
+      fetchImages(query, 1);
+    }
+  }, [query]);
 
   const handleLoadMore = () => {
     if (!isLoading && hasMoreImages) {
@@ -60,7 +66,7 @@ const App = () => {
     setShowModal(false);
   };
 
-  const shouldRenderLoadMore = images.length > 0 && hasMoreImages;
+  const shouldRenderLoadMore = images.length > 0 && hasMoreImages && !isLoading;
 
   return (
     <div className="App">
@@ -71,7 +77,7 @@ const App = () => {
           <Loader />
         </div>
       )}
-      {shouldRenderLoadMore && !isLoading && (
+      {shouldRenderLoadMore && (
         <Button onLoadMore={handleLoadMore} hasMoreImages={hasMoreImages} />
       )}
       {showModal && (
